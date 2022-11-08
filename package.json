@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "devDependencies": {
+    "@commitlint/cli": "17.2.0",
+    "@dwp/commitlint-config-base": "4.0.0"
+  }
+}
