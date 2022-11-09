@@ -94,14 +94,20 @@ Non-extensive list of features exported:
   1. Project webhooks
   1. Add link to new location in source project description
   1. Archive source projects after migration
-  1. Dry Run - prints out to console the list of projects that will be migrated
-  1. Single project export - enter the name of a singular project to export from
-     a group (useful for testing full functionality on a group with many projects)
+  1. Dry Run - prints out to console the list of projects that will be
+     migrated
+  1. Single project export - enter the name of a singular project to export
+     from
+     a group (useful for testing full functionality on a group with many
+     projects)
 
 ## Contributions
 
 - Cut a branch
-- Install pre-commit (v2.18 or above)
+- Pre-commit
+  1. Install pre-commit (v2.18 or above) - using brew or pip
+  1. Brew install shellcheck,
+     [ruby@3.0](https://mac.install.guide/ruby/13.html), semgrep
 - Run `pre-commit install --hook-type` to setup pre-commit
 
 ## License
