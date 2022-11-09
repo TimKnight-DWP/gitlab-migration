@@ -3,6 +3,18 @@
 Script to migrate Gitlab groups and their projects from one Gitlab instance to
 another.
 
+Can be used to migrate groups/repos within the same instance, by providing the
+same path for SOURCE_GITLAB and TARGET_GITLAB, and the same PAT on both lines in
+`.secrets`
+
+Non-extensive list of features exported:
+
+- Tags
+- Commits
+- Open MRs
+- Issues
+- CI/CD Variables (group/project) _Optional_
+
 ## Requirements
 
 - [Bash (4.0 or newer)](https://apple.stackexchange.com/questions/193411/update-bash-to-version-4-0-on-osx)
