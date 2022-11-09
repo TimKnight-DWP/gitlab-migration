@@ -14,6 +14,9 @@ Non-extensive list of features exported:
 - Open MRs
 - Issues
 - CI/CD Variables (group/project) _Optional_
+- Export all projects in a group
+- If you have to re-run due to hitting a rate limit, will skip projects already
+  imported into the target area
 
 ## Requirements
 
@@ -91,6 +94,9 @@ Non-extensive list of features exported:
   1. Project webhooks
   1. Add link to new location in source project description
   1. Archive source projects after migration
+  1. Dry Run - prints out to console the list of projects that will be migrated
+  1. Single project export - enter the name of a singular project to export from
+     a group (useful for testing full functionality on a group with many projects)
 
 ## License
 

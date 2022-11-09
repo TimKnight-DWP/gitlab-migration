@@ -39,6 +39,14 @@ if [ -z ${MIGRATE_HOOKS+x} ]; then
 	printf "Migrate hooks? (yes/no): "
 	read -r MIGRATE_HOOKS
 fi
+if [ -z ${DRY_RUN+x} ]; then
+	printf "Dry run (list projects to export only)? (yes/no): "
+	read -r DRY_RUN
+fi
+if [ -z ${SINGLE_PROJECT_EXPORT+x} ]; then
+	printf "Enter name of single project in group to export, leave blank for all (e.g.: docker-build): "
+	read -r SINGLE_PROJECT_EXPORT
+fi
 #SOURCE_PATH=""
 #TARGET_PATH=""
 #ARCHIVE_AFTER_MIGRATION="no"
@@ -54,6 +62,9 @@ unset -v sourceGitlabPrivateAccessToken targetGitlabPrivateAccessToken
 { IFS=$'\n\r' read -r sourceGitlabPrivateAccessToken && IFS=$'\n\r' read -r targetGitlabPrivateAccessToken; } <.secrets
 
 dryRun=false
+if [[ "$DRY_RUN" == "yes" ]]; then
+	dryRun=true
+fi
 
 baseUrlSourceGitlabApi="https://${SOURCE_GITLAB}/api/v4"
 authHeaderSourceGitlab="PRIVATE-TOKEN: ${sourceGitlabPrivateAccessToken}"
@@ -112,7 +123,7 @@ function migrateGroup() {
 	local groupProjectsUrl="${groupsUrl}/projects?per_page=100&simple=true"
 
 	local -a projects
-	mapfile -t projects <<<"$(getObjects)"
+	mapfile -t projects <<<"$(getObjects)" # Uses groupProjectsUrl and pagination to get all projects in a group
 
 	local -a archivedProjects
 	mapfile -t archivedProjects <<<"$(getObjects "archived")"
@@ -129,8 +140,15 @@ function migrateGroup() {
 	# API doesn't seems to have an option to exclude these projects, so we filter
 	# them here, making sure that the prefix matches the source path.
 	for project in "${allProjects[@]}"; do
+		# =~ in bash 3 applies regex matching
 		if [[ "${project}" =~ ^${SOURCE_PATH} ]]; then
-			allProjectsFiltered+=("${project}")
+			if [[ -z ${SINGLE_PROJECT_EXPORT} ]]; then
+				allProjectsFiltered+=("${project}")
+			elif [[ "${project}" =~ ${SINGLE_PROJECT_EXPORT} ]]; then
+				allProjectsFiltered+=("${project}")
+			else
+				echo "Skipping project: ${project}"
+			fi
 		else
 			echo "Skipping project outside group: ${project}"
 		fi
@@ -225,6 +243,10 @@ function migrateProjects() {
 		if [[ "$ARCHIVE_AFTER_MIGRATION" == "yes" && "$archived" == "false" ]]; then
 			archiveOriginalProject "${project}"
 		fi
+
+		# Rate limit is 6 projects/min so sleep for 5s at the end to reduce chance (importProject/exportProject have several
+		# other `sleep 5` defined, so don't need to go overboard sleeping for 10s here)
+		sleep 5
 
 	done
 }
