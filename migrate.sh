@@ -93,8 +93,13 @@ function getObjects() {
 	headerUrl=$(curl ${CURL_PARAMS} -sS --head --header "${authHeaderSourceGitlab}" "${groupProjectsUrl}${type}")
 	pages=$(grep -ioP '(?<=x-total-pages: ).*' <<<"${headerUrl}" | tr -d '\r')
 
+	echo "Total pages: ${pages}"
+
 	for ((i = 1; i <= "${pages}"; i++)); do
 		local -a objects
+
+		echo "Querying: ${groupProjectsUrl}${type}&page=${i}"
+
 		mapfile -t objects < <(curl ${CURL_PARAMS} -sS --header "${authHeaderSourceGitlab}" "${groupProjectsUrl}${type}&page=${i}" | jq -r '.[].path_with_namespace')
 		local object
 		for object in "${objects[@]}"; do
@@ -120,7 +125,7 @@ function migrateGroup() {
 	local groupsUrl="${baseUrlSourceGitlabApi}/groups/${groupPathEncoded}"
 
 	# https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
-	local groupProjectsUrl="${groupsUrl}/projects?per_page=100&simple=true"
+	local groupProjectsUrl="${groupsUrl}/projects?per_page=50&simple=true"
 
 	local -a projects
 	mapfile -t projects <<<"$(getObjects)" # Uses groupProjectsUrl and pagination to get all projects in a group
