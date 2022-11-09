@@ -98,6 +98,12 @@ Non-extensive list of features exported:
   1. Single project export - enter the name of a singular project to export from
      a group (useful for testing full functionality on a group with many projects)
 
+## Contributions
+
+- Cut a branch
+- Install pre-commit (v2.18 or above)
+- Run `pre-commit install --hook-type` to setup pre-commit
+
 ## License
 
 Copyright (c) 2020 K - Mail Order GmbH & Co. KG
