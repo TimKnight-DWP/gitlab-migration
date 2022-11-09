@@ -5,8 +5,9 @@ another.
 
 ## Requirements
 
-- Bash (4.0 or newer)
-- jq
+- [Bash (4.0 or newer)](https://apple.stackexchange.com/questions/193411/update-bash-to-version-4-0-on-osx)
+- jq `brew install jq`
+- [Grep (3.0 or newer)](https://apple.stackexchange.com/questions/193288/how-to-install-and-use-gnu-grep-in-macos)
 
 ## Usage
 
