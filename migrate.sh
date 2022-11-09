@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/Users/tim.knight1/.homebrew/bin/bash
 set -euo pipefail
 
 SOURCE_GITLAB=${SOURCE_GITLAB:=git.mycpompany.de}

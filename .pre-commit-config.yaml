@@ -1,4 +1,8 @@
 ---
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
 fail_fast: true
 
 repos:
@@ -25,6 +29,8 @@ repos:
     rev: v3.0.0-alpha.3
     hooks:
       - id: prettier
+        stages:
+          - commit
         additional_dependencies:
           - prettier@3.0.0-alpha.2
           - eslint-config-prettier
