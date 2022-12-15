@@ -1,7 +1,7 @@
 #!/Users/tim.knight1/.homebrew/bin/bash
 set -euo pipefail
 
-SOURCE_GITLAB=${SOURCE_GITLAB:=git.mycpompany.de}
+SOURCE_GITLAB=${SOURCE_GITLAB:=gitlab.com}
 TARGET_GITLAB=${TARGET_GITLAB:=gitlab.com}
 if [ -z ${SOURCE_PATH+x} ]; then
 	printf "Enter source group path at ${SOURCE_GITLAB} (e.g. project/team): "
@@ -56,7 +56,7 @@ fi
 #MIGRATE_PROJECT_VARIABLES="no"
 #MIGRATE_BADGES="no"
 #MIGRATE_HOOKS="no"
-CURL_PARAMS=""
+CURL_PARAMS="--retry 2 --retry-delay 15"
 
 unset -v sourceGitlabPrivateAccessToken targetGitlabPrivateAccessToken
 { IFS=$'\n\r' read -r sourceGitlabPrivateAccessToken && IFS=$'\n\r' read -r targetGitlabPrivateAccessToken; } <.secrets
@@ -125,7 +125,7 @@ function migrateGroup() {
 	local groupsUrl="${baseUrlSourceGitlabApi}/groups/${groupPathEncoded}"
 
 	# https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
-	local groupProjectsUrl="${groupsUrl}/projects?per_page=50&simple=true"
+	local groupProjectsUrl="${groupsUrl}/projects?per_page=100&simple=true"
 
 	local -a projects
 	mapfile -t projects <<<"$(getObjects)" # Uses groupProjectsUrl and pagination to get all projects in a group
@@ -228,13 +228,16 @@ function migrateProjects() {
 			echo " Done"
 		fi
 		migrateProject "${project}"
+		sleep 5
 
 		if [[ "$MIGRATE_PROJECT_VARIABLES" == "yes" ]]; then
 			migrateProjectVariables "${project}"
+			sleep 5
 		fi
 
 		if [[ "$MIGRATE_HOOKS" == "yes" ]]; then
 			migrateHooks "${project}"
+			sleep 5
 		fi
 
 		if [[ "$ADD_DESCRIPTION" == "yes" ]]; then
@@ -243,6 +246,7 @@ function migrateProjects() {
 
 		if [[ "$MIGRATE_ARCHIVED_PROJECTS" == "yes" && "$archived" == "true" ]]; then
 			archiveProjects "${project}"
+			sleep 5
 		fi
 
 		if [[ "$ARCHIVE_AFTER_MIGRATION" == "yes" && "$archived" == "false" ]]; then
@@ -332,7 +336,7 @@ function migrateProject() {
 	# Should export issues, comments, MR diffs etc in GL 15.6
 	# https://docs.gitlab.com/ee/user/project/settings/import_export.html#items-that-are-exported
 	local projectExportUrl="${baseUrlSourceGitlabApi}/projects/${projectEncoded}/export"
-	if (${dryRun}); then
+	if [[ ${dryRun} == "true" ]]; then
 		echo "${projectExportUrl}"
 	else
 		local export
